@@ -658,12 +658,14 @@
                         timer.remainingSeconds = 0;
                         timer.overtimeSeconds = 0;
                         playAlarm(timer.id);
+                        renderTimers(); // Full re-render when switching to overtime
+                    } else {
+                        updateTimerDisplay(timer); // Just update display
                     }
                 } else {
                     timer.overtimeSeconds++;
+                    updateTimerDisplay(timer); // Just update display
                 }
-                
-                renderTimers();
             }, 1000);
         }
 
@@ -789,7 +791,7 @@
             return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
         }
 
-        function drawProgressRing(percentage, isOvertime) {
+        function drawProgressRing(percentage, isOvertime, timerId) {
             const radius = 85;
             const circumference = 2 * Math.PI * radius;
             const offset = circumference - (percentage / 100) * circumference;
@@ -808,6 +810,7 @@
                         fill="none"
                     />
                     <circle
+                        id="progress-circle-${timerId}"
                         class="progress-ring-circle"
                         cx="100"
                         cy="100"
@@ -821,6 +824,31 @@
                     />
                 </svg>
             `;
+        }
+
+        function updateTimerDisplay(timer) {
+            const timeEl = document.getElementById(`timer-time-${timer.id}`);
+            const progressCircle = document.getElementById(`progress-circle-${timer.id}`);
+            
+            if (!timeEl || !progressCircle) return;
+            
+            let displayTime, progressPercentage;
+            if (timer.isOvertime) {
+                displayTime = '+' + formatTimeFromSeconds(timer.overtimeSeconds);
+                progressPercentage = 100;
+            } else {
+                displayTime = formatTimeFromSeconds(timer.remainingSeconds);
+                progressPercentage = (timer.remainingSeconds / timer.originalDuration) * 100;
+            }
+            
+            // Update time text
+            timeEl.textContent = displayTime;
+            
+            // Update progress ring
+            const radius = 85;
+            const circumference = 2 * Math.PI * radius;
+            const offset = circumference - (progressPercentage / 100) * circumference;
+            progressCircle.setAttribute('stroke-dashoffset', offset);
         }
 
         function restartTimer(timerId) {
@@ -859,7 +887,7 @@
                 }
 
                 const overtimeClass = timer.isOvertime ? 'overtime' : '';
-                const progressRing = drawProgressRing(progressPercentage, timer.isOvertime);
+                const progressRing = drawProgressRing(progressPercentage, timer.isOvertime, timer.id);
                 
                 const controls = timer.isOvertime
                     ? `
@@ -874,7 +902,7 @@
                     `;
 
                 return `
-                    <div class="timer-card ${overtimeClass}">
+                    <div class="timer-card ${overtimeClass}" id="timer-card-${timer.id}">
                         <div class="timer-header">
                             <span class="timer-icon">${icon}</span>
                             <span>${originalLabel} timer</span>
@@ -882,7 +910,7 @@
                         <div class="timer-display">
                             <div class="progress-ring">
                                 ${progressRing}
-                                <div class="timer-time">${displayTime}</div>
+                                <div class="timer-time" id="timer-time-${timer.id}">${displayTime}</div>
                             </div>
                             ${label ? `<div class="timer-label">${label}</div>` : ''}
                         </div>
