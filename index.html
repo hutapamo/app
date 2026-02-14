@@ -266,6 +266,7 @@
 
         .progress-ring svg {
             transform: rotate(-90deg);
+            display: block;
         }
 
         .progress-ring-circle {
@@ -283,6 +284,8 @@
             font-variant-numeric: tabular-nums;
             line-height: 1;
             width: 100%;
+            pointer-events: none;
+            z-index: 10;
         }
 
         .timer-card.overtime .timer-time {
