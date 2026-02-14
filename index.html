@@ -156,27 +156,54 @@
         }
 
         .history {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin-top: 20px;
+            margin-top: 24px;
+        }
+
+        .history-title {
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .history-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
         }
 
         .history-item {
             background: var(--bg);
             border: 2px solid var(--border);
-            border-radius: 8px;
-            padding: 10px 16px;
+            border-radius: 12px;
+            padding: 16px;
             cursor: pointer;
             transition: all 0.2s;
-            font-weight: 500;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
         .history-item:hover {
             border-color: var(--primary);
             background: var(--surface-hover);
             transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+        }
+
+        .history-item-time {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .history-item-label {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .timers-grid {
@@ -227,14 +254,40 @@
         .timer-display {
             text-align: center;
             margin-bottom: 20px;
+            position: relative;
+        }
+
+        .progress-ring {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .progress-ring svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            transform: rotate(-90deg);
+            display: block;
+        }
+
+        .progress-ring-circle {
+            transition: stroke-dashoffset 0.3s ease;
+            transform-origin: center;
         }
 
         .timer-time {
-            font-size: 3.5rem;
+            position: relative;
+            z-index: 10;
+            font-size: 1.8rem;
             font-weight: 700;
             font-variant-numeric: tabular-nums;
             line-height: 1;
-            margin-bottom: 8px;
+            text-align: center;
         }
 
         .timer-card.overtime .timer-time {
@@ -445,7 +498,10 @@
             <div style="text-align: center;">
                 <button class="btn btn-primary" onclick="createTimer()">Start Timer</button>
             </div>
-            <div class="history" id="history"></div>
+            <div class="history" id="history">
+                <div class="history-title">Recent Timers</div>
+                <div class="history-grid" id="historyGrid"></div>
+            </div>
         </div>
 
         <div class="timers-grid" id="timers">
@@ -509,22 +565,52 @@
 
         function renderHistory() {
             const historyEl = document.getElementById('history');
+            const historyGrid = document.getElementById('historyGrid');
+            
             if (timerHistory.length === 0) {
-                historyEl.innerHTML = '';
+                historyEl.style.display = 'none';
                 return;
             }
             
-            historyEl.innerHTML = timerHistory.map(h => {
+            historyEl.style.display = 'block';
+            historyGrid.innerHTML = timerHistory.map(h => {
+                const timeStr = formatTime(h.hours, h.minutes, h.seconds);
                 const label = formatDuration(h.hours, h.minutes, h.seconds);
-                return `<div class="history-item" onclick="loadFromHistory(${h.hours}, ${h.minutes}, ${h.seconds})">${label}</div>`;
+                return `
+                    <div class="history-item" onclick="quickStart(${h.hours}, ${h.minutes}, ${h.seconds})">
+                        <div class="history-item-time">${timeStr}</div>
+                        <div class="history-item-label">Quick Start</div>
+                    </div>
+                `;
             }).join('');
         }
 
-        function loadFromHistory(hours, minutes, seconds) {
-            document.getElementById('hours').value = hours;
-            document.getElementById('minutes').value = minutes;
-            document.getElementById('seconds').value = seconds;
+        function quickStart(hours, minutes, seconds) {
+            const totalSeconds = hours * 3600 + minutes * 60 + seconds;
+            
+            const timer = {
+                id: nextTimerId++,
+                originalDuration: totalSeconds,
+                originalHours: hours,
+                originalMinutes: minutes,
+                originalSeconds: seconds,
+                remainingSeconds: totalSeconds,
+                startTime: new Date(),
+                isOvertime: false,
+                overtimeSeconds: 0,
+                alarmPlaying: false,
+                interval: null
+            };
+
+            timers.push(timer);
+            renderTimers();
+            startTimer(timer);
+            
+            // Move to top of history
+            addToHistory(hours, minutes, seconds);
         }
+
+
 
         function formatDuration(h, m, s) {
             const parts = [];
@@ -563,8 +649,8 @@
             };
 
             timers.push(timer);
-            startTimer(timer);
             renderTimers();
+            startTimer(timer);
         }
 
         function startTimer(timer) {
@@ -577,12 +663,14 @@
                         timer.remainingSeconds = 0;
                         timer.overtimeSeconds = 0;
                         playAlarm(timer.id);
+                        renderTimers(); // Full re-render when switching to overtime
+                    } else {
+                        updateTimerDisplay(timer); // Just update display
                     }
                 } else {
                     timer.overtimeSeconds++;
+                    updateTimerDisplay(timer); // Just update display
                 }
-                
-                renderTimers();
             }, 1000);
         }
 
@@ -708,6 +796,77 @@
             return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
         }
 
+        function drawProgressRing(percentage, isOvertime, timerId) {
+            const radius = 85;
+            const circumference = 2 * Math.PI * radius;
+            const offset = circumference - (percentage / 100) * circumference;
+            
+            const strokeColor = isOvertime ? '#EF4444' : '#818CF8';
+            const bgColor = '#334155';
+            
+            return `
+                <svg width="200" height="200" viewBox="0 0 200 200">
+                    <circle
+                        cx="100"
+                        cy="100"
+                        r="${radius}"
+                        stroke="${bgColor}"
+                        stroke-width="12"
+                        fill="none"
+                    />
+                    <circle
+                        id="progress-circle-${timerId}"
+                        class="progress-ring-circle"
+                        cx="100"
+                        cy="100"
+                        r="${radius}"
+                        stroke="${strokeColor}"
+                        stroke-width="12"
+                        fill="none"
+                        stroke-dasharray="${circumference}"
+                        stroke-dashoffset="${offset}"
+                        stroke-linecap="round"
+                    />
+                </svg>
+            `;
+        }
+
+        function updateTimerDisplay(timer) {
+            const timeEl = document.getElementById(`timer-time-${timer.id}`);
+            const progressCircle = document.getElementById(`progress-circle-${timer.id}`);
+            
+            if (!timeEl || !progressCircle) {
+                console.log('Elements not found, doing full render');
+                renderTimers();
+                return;
+            }
+            
+            let displayTime, progressPercentage;
+            if (timer.isOvertime) {
+                displayTime = '+' + formatTimeFromSeconds(timer.overtimeSeconds);
+                progressPercentage = 100;
+            } else {
+                displayTime = formatTimeFromSeconds(timer.remainingSeconds);
+                progressPercentage = (timer.remainingSeconds / timer.originalDuration) * 100;
+            }
+            
+            // Update time text
+            timeEl.textContent = displayTime;
+            
+            // Update progress ring
+            const radius = 85;
+            const circumference = 2 * Math.PI * radius;
+            const offset = circumference - (progressPercentage / 100) * circumference;
+            progressCircle.setAttribute('stroke-dashoffset', offset);
+        }
+
+        function restartTimer(timerId) {
+            const timer = timers.find(t => t.id === timerId);
+            if (!timer) return;
+            
+            quickStart(timer.originalHours, timer.originalMinutes, timer.originalSeconds);
+        }
+
         function renderTimers() {
             const container = document.getElementById('timers');
             
@@ -725,16 +884,19 @@
                 const icon = timer.isOvertime ? '🔴' : '⏱';
                 const originalLabel = formatDuration(timer.originalHours, timer.originalMinutes, timer.originalSeconds);
                 
-                let displayTime, label;
+                let displayTime, label, progressPercentage;
                 if (timer.isOvertime) {
                     displayTime = '+' + formatTimeFromSeconds(timer.overtimeSeconds);
                     label = 'overtime';
+                    progressPercentage = 100; // Full circle in overtime
                 } else {
                     displayTime = formatTimeFromSeconds(timer.remainingSeconds);
                     label = '';
+                    progressPercentage = (timer.remainingSeconds / timer.originalDuration) * 100;
                 }
 
                 const overtimeClass = timer.isOvertime ? 'overtime' : '';
+                const progressRing = drawProgressRing(progressPercentage, timer.isOvertime, timer.id);
                 
                 const controls = timer.isOvertime
                     ? `
@@ -743,16 +905,22 @@
                             : ''}
                         <button class="btn btn-danger btn-small" onclick="stopTimer(${timer.id})">Stop</button>
                     `
-                    : `<button class="btn btn-danger btn-small" onclick="stopTimer(${timer.id})">Stop</button>`;
+                    : `
+                        <button class="btn btn-secondary btn-small" onclick="restartTimer(${timer.id})">↻ Restart</button>
+                        <button class="btn btn-danger btn-small" onclick="stopTimer(${timer.id})">Stop</button>
+                    `;
 
                 return `
-                    <div class="timer-card ${overtimeClass}">
+                    <div class="timer-card ${overtimeClass}" id="timer-card-${timer.id}">
                         <div class="timer-header">
                             <span class="timer-icon">${icon}</span>
                             <span>${originalLabel} timer</span>
                         </div>
                         <div class="timer-display">
-                            <div class="timer-time">${displayTime}</div>
+                            <div class="progress-ring">
+                                ${progressRing}
+                                <div class="timer-time" id="timer-time-${timer.id}">${displayTime}</div>
+                            </div>
                             ${label ? `<div class="timer-label">${label}</div>` : ''}
                         </div>
                         <div class="timer-meta">Started at ${formatTimeOfDay(timer.startTime)}</div>

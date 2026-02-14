@@ -58,12 +58,14 @@ You can run **multiple timers at the same time**, each operating independently w
 - Each timer's alarm can be silenced independently without affecting the others.
 - When a timer is stopped, its session summary is shown individually.
 
-## Timer History
+## Timer History & Quick Restart
 
 - The app remembers the **last 6 timer durations** you've used.
-- These appear as quick-select options when creating a new timer, so you can reuse a recent duration with a single tap.
+- These appear as prominent, one-click buttons when creating a new timer, so you can instantly start a recent duration.
 - History is ordered most-recent-first and automatically rotates — the oldest entry drops off when a 7th unique duration is used.
 - Duplicate durations don't create new entries; they move the existing one to the top.
+- **Quick restart button** — Each running timer has a restart button to immediately start a fresh timer with the same duration.
+- Perfect for repeated tasks: workouts, cooking, pomodoro sessions, etc.
 
 ## Timer Display — What You See
 
@@ -71,9 +73,10 @@ You can run **multiple timers at the same time**, each operating independently w
 ```
 ┌─────────────────────────┐
 │  ⏱  3:00 timer          │
+│   ◯ Circular Progress   │  ← Visual ring showing time remaining
 │     02:14               │
 │  Started at 2:35 PM     │
-│        [Stop]           │
+│  [Stop]   [↻ Restart]   │
 └─────────────────────────┘
 ```
 
@@ -81,6 +84,7 @@ You can run **multiple timers at the same time**, each operating independently w
 ```
 ┌─────────────────────────┐
 │  🔴 3:00 timer          │
+│   ◯ Full ring (red)     │  ← Progress ring full and pulsing
 │    +00:00:42 overtime    │
 │  Started at 2:35 PM     │
 │  [Silence]    [Stop]    │
@@ -89,6 +93,12 @@ You can run **multiple timers at the same time**, each operating independently w
 
 The original duration and start timestamp are **always visible**, regardless of which phase the timer is in.
 
+**Visual Progress Indicator:**
+- Circular progress ring smoothly depletes as countdown progresses
+- No flickering or jarring updates
+- During overtime, ring fills with red and pulses to draw attention
+- Provides at-a-glance understanding of timer state without reading numbers
+
 ## Design Principles
 
 - **Simple by default** — Setting a timer should take seconds, not taps through menus.
@@ -96,6 +106,8 @@ The original duration and start timestamp are **always visible**, regardless of 
 - **Non-destructive** — Silencing the alarm should never kill the overtime counter.
 - **Respectful** — No ads, no unnecessary permissions, no bloat.
 - **Multi-timer first** — The UI is designed around having several timers running; one timer is just a special case.
+- **Smooth visuals** — No jarring updates; use smooth circular progress indicators to show countdown at a glance.
+- **Quick restart** — One-click to restart any timer from history, making repeated timing tasks effortless.
 
 ## What's Next
 
