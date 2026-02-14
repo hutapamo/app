@@ -598,8 +598,8 @@
             };
 
             timers.push(timer);
-            startTimer(timer);
             renderTimers();
+            startTimer(timer);
             
             // Move to top of history
             addToHistory(hours, minutes, seconds);
@@ -644,8 +644,8 @@
             };
 
             timers.push(timer);
-            startTimer(timer);
             renderTimers();
+            startTimer(timer);
         }
 
         function startTimer(timer) {
@@ -830,7 +830,11 @@
             const timeEl = document.getElementById(`timer-time-${timer.id}`);
             const progressCircle = document.getElementById(`progress-circle-${timer.id}`);
             
-            if (!timeEl || !progressCircle) return;
+            if (!timeEl || !progressCircle) {
+                console.log('Elements not found, doing full render');
+                renderTimers();
+                return;
+            }
             
             let displayTime, progressPercentage;
             if (timer.isOvertime) {
