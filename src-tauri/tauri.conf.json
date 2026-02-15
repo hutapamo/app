@@ -1,0 +1,50 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "OverTimer",
+  "version": "0.1.0",
+  "identifier": "com.overtimer.app",
+  "build": {
+    "beforeDevCommand": "",
+    "devUrl": "../src",
+    "beforeBuildCommand": "",
+    "frontendDist": "../src"
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "copyright": "",
+    "category": "Productivity",
+    "shortDescription": "The timer that keeps counting when you go over",
+    "longDescription": "OverTimer is a desktop timer application that continues counting after the timer expires, tracking your overtime automatically.",
+    "macOS": {
+      "minimumSystemVersion": "10.13"
+    }
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "OverTimer",
+        "width": 1000,
+        "height": 800,
+        "minWidth": 600,
+        "minHeight": 500,
+        "resizable": true,
+        "fullscreen": false,
+        "transparent": false,
+        "decorations": true,
+        "alwaysOnTop": false,
+        "center": true
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'"
+    }
+  }
+}

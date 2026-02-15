@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OverTimer — The Timer That Keeps Counting</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⏱️ OverTimer</h1>
+            <p class="tagline">The timer that keeps counting when you go over</p>
+        </header>
+
+        <div class="timer-creator">
+            <div class="input-group">
+                <div>
+                    <input type="number" id="hours" class="time-input" value="0" min="0" max="23">
+                    <span class="time-label">Hours</span>
+                </div>
+                <div>
+                    <input type="number" id="minutes" class="time-input" value="3" min="0" max="59">
+                    <span class="time-label">Minutes</span>
+                </div>
+                <div>
+                    <input type="number" id="seconds" class="time-input" value="0" min="0" max="59">
+                    <span class="time-label">Seconds</span>
+                </div>
+            </div>
+            <div style="text-align: center;">
+                <button class="btn btn-primary" onclick="createTimer()">Start Timer</button>
+            </div>
+            <div class="history" id="history">
+                <div class="history-title">Recent Timers</div>
+                <div class="history-grid" id="historyGrid"></div>
+            </div>
+        </div>
+
+        <div class="timers-grid" id="timers">
+            <div class="empty-state">
+                <div class="empty-state-icon">⏱️</div>
+                <div class="empty-state-text">Create your first timer to get started</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="summaryModal">
+        <div class="modal-content">
+            <h2>Timer Complete</h2>
+            <div id="summaryContent"></div>
+            <div class="modal-actions">
+                <button class="btn btn-primary" onclick="closeSummary()">Got it</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="alarmSound" loop>
+        <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=" type="audio/wav">
+    </audio>
+
+    <script src="app.js"></script>
+</body>
+</html>
