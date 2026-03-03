@@ -3,6 +3,28 @@
 ---
 
 ## 2026-03-03 16:08 (SAST)
+**Commit:** `chore: untrack gen schemas and add src-tauri/gen/ to gitignore`
+
+**Summary**
+- Removed generated Tauri schemas from git tracking
+- Added `src-tauri/gen/` to `.gitignore` to prevent re-adding
+
+**Details**
+- What changed:
+  - `.gitignore`: Added `src-tauri/gen/` entry
+  - `src-tauri/gen/schemas/*.json`: Untracked (files remain locally, just no longer in git)
+- Why:
+  - These files are auto-generated on every Tauri build and are considered build output/bloat
+  - They should not be version-controlled
+- Impact / Notes:
+  - No runtime or build behaviour affected; files will still exist locally after a build
+
+**Files**
+- `.gitignore`
+
+---
+
+## 2026-03-03 16:08 (SAST)
 **Commit:** `chore: add copilot commit skill, remove unused tauri dev config, add gen schemas`
 
 **Summary**

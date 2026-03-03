@@ -22,3 +22,4 @@ src-tauri/Cargo.lock
 # Build outputs
 dist/
 build/
+src-tauri/gen/
