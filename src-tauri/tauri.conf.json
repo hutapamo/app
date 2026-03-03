@@ -4,9 +4,6 @@
   "version": "0.1.0",
   "identifier": "com.overtimer.app",
   "build": {
-    "beforeDevCommand": "",
-    "devUrl": "../src",
-    "beforeBuildCommand": "",
     "frontendDist": "../src"
   },
   "bundle": {
