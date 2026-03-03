@@ -4,11 +4,35 @@
       <stop offset="0%" style="stop-color:#4F46E5;stop-opacity:1" />
       <stop offset="100%" style="stop-color:#C084FC;stop-opacity:1" />
     </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#00000044"/>
+    </filter>
   </defs>
+
+  <!-- Background -->
   <rect width="1024" height="1024" rx="180" fill="url(#grad)"/>
-  <circle cx="512" cy="450" r="280" fill="none" stroke="white" stroke-width="40"/>
-  <line x1="512" y1="450" x2="512" y2="250" stroke="white" stroke-width="35" stroke-linecap="round"/>
-  <line x1="512" y1="450" x2="680" y2="520" stroke="white" stroke-width="35" stroke-linecap="round"/>
-  <circle cx="512" cy="450" r="25" fill="white"/>
-  <text x="512" y="780" font-family="Arial, sans-serif" font-size="120" font-weight="bold" fill="white" text-anchor="middle">+00:00</text>
+
+  <!-- Clock circle -->
+  <circle cx="512" cy="420" r="260" fill="none" stroke="white" stroke-width="36" filter="url(#shadow)"/>
+
+  <!-- Clock tick marks -->
+  <line x1="512" y1="180" x2="512" y2="210" stroke="white" stroke-width="16" stroke-linecap="round"/>
+  <line x1="512" y1="610" x2="512" y2="640" stroke="white" stroke-width="16" stroke-linecap="round"/>
+  <line x1="252" y1="420" x2="282" y2="420" stroke="white" stroke-width="16" stroke-linecap="round"/>
+  <line x1="742" y1="420" x2="772" y2="420" stroke="white" stroke-width="16" stroke-linecap="round"/>
+
+  <!-- Hour hand -->
+  <line x1="512" y1="420" x2="512" y2="260" stroke="white" stroke-width="32" stroke-linecap="round"/>
+
+  <!-- Minute hand -->
+  <line x1="512" y1="420" x2="660" y2="480" stroke="white" stroke-width="28" stroke-linecap="round"/>
+
+  <!-- Center dot -->
+  <circle cx="512" cy="420" r="22" fill="white"/>
+
+  <!-- Divider line -->
+  <line x1="200" y1="740" x2="824" y2="740" stroke="white" stroke-width="4" stroke-opacity="0.4"/>
+
+  <!-- Timer label -->
+  <text x="512" y="870" font-family="Arial, sans-serif" font-size="100" font-weight="bold" fill="white" text-anchor="middle" opacity="0.95">TIMER</text>
 </svg>
